@@ -1786,6 +1786,8 @@ CheckRestartTime( void )
 #ifdef OSFDEBUG
 /* only those other systems are this slow :-) */
         sleeptime = 6 - (int) (time((time_t *) 0) - statb.st_atime);
+#elif defined(__linux__)
+        sleeptime = 6 - (int) (time((time_t *) 0) - statb.st_atime);
 #else
 	sleeptime = 30 - (int) (time((time_t *) 0) - statb.st_atime);
 #endif
