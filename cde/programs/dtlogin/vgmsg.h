@@ -99,6 +99,9 @@
 #define MC_PERS_GREET_LABEL     26
 #define MC_FS_LABEL		27
 
+#define MC_OS_REBOOT_LABEL	28
+#define MC_OS_SHUTDOWN_LABEL	29
+
 /*
  *  Sun specific message catalog id numbers in MC_LABEL_SET messages.
  *  (Starting at a random uneven higher number to allow some room  
@@ -130,6 +133,8 @@
 #define MC_HELP			1
 #define MC_SYSTEM		2
 #define MC_HELP_CHOOSER         3
+#define MC_REBOOT_OS_MSG	4
+#define MC_SHUTDOWN_OS_MSG	5
 
 #define MC_LOG_SET		4
 #define MC_LOG_ACC_FILE		1
@@ -235,6 +240,9 @@
 #define MC_DEF_PERS_GREET_LABEL	"Welcome %s"
 #define MC_DEF_DT_LABEL		"Regular Desktop"
 #define MC_DEF_SES_LABEL	"Session"
+
+#define MC_DEF_OS_REBOOT_LABEL	"Restart the host"
+#define MC_DEF_OS_SHUTDOWN_LABEL	"Shutdown the host"
 
 #define MC_DEF_LOGIN		"Login incorrect; please try again."
 #define MC_DEF_HOME		"Unable to change to home directory."
@@ -357,6 +365,10 @@ refresh the screen, for example, if system messages make the\n\
 screen unreadable.\n\
 \n\
 "
+
+#define MC_DEF_REBOOT_OS_MSG  "Are you sure you want to reboot the host?"
+
+#define MC_DEF_SHUTDOWN_OS_MSG   "Are you sure you want to shutdown the host?"
  
 
 #define MC_DEF_SUS1_LABEL	"* Suspending Desktop Login...\r\n*\r\n"

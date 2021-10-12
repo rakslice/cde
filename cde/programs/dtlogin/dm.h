@@ -453,6 +453,8 @@ struct verify_info {
 #ifdef BYPASSLOGIN
 # define GREETLESS_FAILED       6
 #endif /* BYPASSLOGIN */
+# define OS_REBOOT_DISPLAY	7
+# define OS_SHUTDOWN_DISPLAY	8
 
 /*
  * CloseOnFork flags
@@ -640,6 +642,8 @@ extern int  StartDisplay(
 extern void StartDisplays( void ) ;
 extern void StopDisplay(
 			struct display *d) ;
+extern void OSReboot( void ) ;
+extern void OSShutdown( void ) ;
 extern void WaitForChild( void ) ;
 extern int  main(
 			int argc,

@@ -2393,6 +2393,30 @@ RunGreeter( struct display *d, struct greet_info *greet,
 		else
 		    return;
 
+	    case NOTIFY_OS_REBOOT:
+	        Debug ("Greeter requested OS reboot\n");
+		if (d->serverPid >= 2)
+		    /*
+		     *  Don't do a SessionExit() here since that causes
+		     *  the X-server to be reset. We know we are going to
+		     *  terminate it anyway, so just go do that...
+		     */
+		    exit(OS_REBOOT_DISPLAY);
+		else
+		    return;
+
+	    case NOTIFY_OS_SHUTDOWN:
+	        Debug ("Greeter requested OS shutdown\n");
+		if (d->serverPid >= 2)
+		    /*
+		     *  Don't do a SessionExit() here since that causes
+		     *  the X-server to be reset. We know we are going to
+		     *  terminate it anyway, so just go do that...
+		     */
+		    exit(OS_SHUTDOWN_DISPLAY);
+		else
+		    return;
+
 	    case NOTIFY_LANG_CHANGE:
 		Debug ("Greeter requested LANG_CHANGE\n");
 
