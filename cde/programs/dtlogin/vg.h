@@ -112,6 +112,9 @@ extern int errno;
 #define	OB_DT			7
 #define	OB_ALT_DTS		8
 #define	OB_LAST_DT		10
+
+#define OB_OS_REBOOT		11
+#define OB_OS_SHUTDOWN		12
  
 #ifndef LAST_SESSION_FILE
 #define LAST_SESSION_FILE "/.dt/sessions/lastsession"
@@ -249,7 +252,7 @@ typedef enum widgetType { CascadeBG, DrawingA, Frame, Form, MessageBox,
 
 
 typedef enum dialogType { error, help, copyright, hostname, expassword,
-			  help_chooser }
+			  help_chooser, confirm_os_reboot, confirm_os_shutdown }
 	     DialogType;
 
 
@@ -349,6 +352,8 @@ extern Widget help_message;	/* the help message box			   */
 extern Widget error_message;	/* the error message box		   */
 extern Widget hostname_message;	/* the invalid hostname message box	   */
 extern Widget passwd_message;	/* the password expired message box	   */
+extern Widget confirm_os_reboot_message;	/* os reboot confirmation dialog */
+extern Widget confirm_os_shutdown_message;	/* os shutdown confirmation dialog */
 
 extern Widget options_menu;	/* pop-up menu on options button	   */
 extern Widget options_item[];	/* items on options pop_up menu	  	   */

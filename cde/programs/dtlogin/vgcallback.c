@@ -804,6 +804,14 @@ MenuItemCB( Widget w, XtPointer client_data, XtPointer call_data )
 	CleanupAndExit(NULL, NOTIFY_NO_WINDOWS);
 	break;
 
+    case OB_OS_REBOOT:
+	_DtShowDialog(confirm_os_reboot, NULL);
+	break;
+
+    case OB_OS_SHUTDOWN:
+	_DtShowDialog(confirm_os_shutdown, NULL);
+	break;
+
     case OB_COPYRIGHT:
 	_DtShowDialog(copyright, NULL);
 	break;
@@ -1654,6 +1662,16 @@ RespondDialogCB(
       CleanupAndExit(w, NOTIFY_NO_WINDOWS);
     }
   }
+  else if (w == confirm_os_reboot_message)
+  {
+    if (reason->reason == XmCR_OK)
+      CleanupAndExit(w, NOTIFY_OS_REBOOT);
+  }
+  else if (w == confirm_os_shutdown_message)
+  {
+    if (reason->reason == XmCR_OK)
+      CleanupAndExit(w, NOTIFY_OS_SHUTDOWN);
+  }
 }
 
 /***************************************************************************
@@ -1801,6 +1819,8 @@ _DtShowDialog( DialogType dtype, XmString msg)
       case help:       w = &help_message; break;
       case hostname:   w = &hostname_message; break;
       case help_chooser: w = &help_message; break;
+      case confirm_os_reboot: w = &confirm_os_reboot_message; break;
+      case confirm_os_shutdown: w = &confirm_os_shutdown_message; break;
     }
 
     if (*w == NULL)
