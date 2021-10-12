@@ -167,6 +167,7 @@ Account( struct display *d, char *user, char *line, pid_t pid,
 	   d->utmpId, user_str, line_str, pid, buf);
 
 #ifdef PAM
+    Debug("PamAccounting call from Account()\n");
     PamAccounting("dtlogin", d->name, d->utmpId, user, 
 		        line, pid, type, exitcode);
 #else

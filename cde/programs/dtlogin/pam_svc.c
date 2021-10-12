@@ -54,6 +54,10 @@
 #include "dm.h"
 #include "solaris.h"
 
+#ifndef sun
+#define NO_SOLARIS_EXTENSIONS 1
+#endif
+
 /*
  * Local function declarations
  */
@@ -104,7 +108,10 @@ PamInit(char* prog_name,
 	}
 
 	if (status == PAM_SUCCESS) {
-            if (line_dev) pam_set_item(pamh, PAM_TTY, line_dev);
+            if (line_dev && strcmp(line_dev, "NULL") != 0 && strcmp(line_dev, "/dev/NULL") != 0) {
+		Debug("pam_set_item PAM_TTY %s\n", line_dev);
+		pam_set_item(pamh, PAM_TTY, line_dev);
+	    }
 	    if (display_name) pam_set_item(pamh, PAM_RHOST, display_name);
 	}
 
@@ -217,12 +224,16 @@ PamAccounting( char*   prog_name,
 
         /* Open Solaris PAM (Plugable Authentication module ) connection */
 
+#ifndef NO_SOLARIS_EXTENSIONS
 	if (entry_type == ACCOUNTING) {
 	    tty_line = line;
 	}
 	else {
+#endif
 	    tty_line = line_dev;
+#ifndef NO_SOLARIS_EXTENSIONS
 	}
+#endif
 
 	status = PamInit(prog_name, user, tty_line, display_name);
 
@@ -238,15 +249,18 @@ PamAccounting( char*   prog_name,
 								 status); 
 		}
 		session_type = SOLARIS_LOGIN;
+#ifndef NO_SOLARIS_EXTENSIONS
 		status = solaris_setutmp_mgmt(user, tty_line, display_name, 
 					session_type, entry_type, entry_id); 
 	        if (status != SOLARIS_SUCCESS) {
                     Debug("PamAccounting: USER_PRCESS set_utmp error=%d\n", 
 								status);
  		}
+#endif
 		break;
 
 
+#ifndef NO_SOLARIS_EXTENSIONS
 	    case ACCOUNTING:
 		/* 
 		 * User session has terminated, mark it DEAD and close 
@@ -267,7 +281,7 @@ PamAccounting( char*   prog_name,
 								status);
  		}
 		/* Intentional fall thru */
-
+#endif
 
 	    case DEAD_PROCESS:
 		/* Cleanup account files for dead processes */
@@ -277,6 +291,7 @@ PamAccounting( char*   prog_name,
 								 status); 
 	        }
 
+#ifndef NO_SOLARIS_EXTENSIONS
 		status = solaris_reset_utmp_mgmt(&user, &tty_line,
 						 &display_name, 0,
 						 entry_type, entry_id);
@@ -285,6 +300,7 @@ PamAccounting( char*   prog_name,
                     Debug("PamAccounting: DEAD_PROCESS reset_utmp error=%d\n",
 								      status);
 		}
+#endif
 		break;
 
 
@@ -296,12 +312,14 @@ PamAccounting( char*   prog_name,
 								 status); 
 	        }
 		session_type = 0;
+#ifndef NO_SOLARIS_EXTENSIONS
 		status = solaris_setutmp_mgmt(user, tty_line, display_name, 
 					 session_type, entry_type, entry_id); 
 	        if (status != SOLARIS_SUCCESS) {
                     Debug("PamAccounting: LOGIN_PROCESS set_utmp error=%d\n",
 								status);
  		}
+#endif
 		break;
 	}
 

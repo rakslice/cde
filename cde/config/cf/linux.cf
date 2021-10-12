@@ -84,6 +84,8 @@ XCOMM binutils:  (LinuxBinUtilsMajorVersion)
 #define HasShm			YES
 #define HasSockets		YES
 
+#define UsePam			YES
+
 #define HasMakefileSafeInclude  YES
 #define DependFileName          .depend
 #define DependCmd               $(CC) -E -MM -MG

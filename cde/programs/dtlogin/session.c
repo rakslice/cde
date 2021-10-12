@@ -1337,10 +1337,23 @@ StartClient( struct verify_info *verify, struct display *d, int *pidp )
 #endif /* AIXV3 */
 
 
+/* FIXME actually handle multiple groups with PAM */
 
 #if defined(PAM)
+	int verify_gid;
+
+	#ifdef NGROUPS
+	if (verify->ngroups > 0) {
+		verify_gid = verify->groups[0];
+	} else {
+		verify_gid = 100; /* users */
+	}
+	#else
+	verify_gid = verify->gid;
+	#endif	
+
 	if (PamSetCred( verify->argv[0], 
-			     user, verify->uid, verify->gid) > 0 ) {
+			     user, verify->uid, verify_gid) > 0 ) {
             Debug("Can't set User's Credentials (user=%s)\n",user);
 	    return(0);
 	} 

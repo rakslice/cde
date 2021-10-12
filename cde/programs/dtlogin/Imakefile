@@ -39,6 +39,16 @@ DESSRCS =
 #endif
 
 #if UsePamLibrary
+# ifndef UsePam
+#  define UsePam	YES
+# endif
+#endif
+
+#ifndef UsePam
+# define UsePam		NO
+#endif
+
+#if UsePam
 PAM_SRCS = pam_svc.c
 PAM_OBJS = pam_svc.o
 PAM_LIB = -lpam
@@ -122,8 +132,15 @@ SYS_LIBRARIES = -lm -lXdmcp
 
 #if defined(LinuxArchitecture) || \
     defined(FreeBSDArchitecture) || defined(NetBSDArchitecture)
+
+#if UsePam
+SYS_LIBRARIES = -lm $(PAM_LIB)
+EXTRA_DEFINES = $(XINOPT) -DPAM
+#else
 SYS_LIBRARIES = -lm -lcrypt
 EXTRA_DEFINES = $(XINOPT)
+#endif
+
 LOGINXLIB = $(XLIB) $(XINLIB)
 /* just use the system provided Xau and Xdmcp*/
 DEPXAUTHLIB = 

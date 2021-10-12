@@ -1901,6 +1901,71 @@ PasswordAged( struct passwd *pw )
   return(FALSE);
 }
 
+/***
+ * helper function for tty name
+ ***/
+
+#ifdef __linux__
+
+#define HAVE_PID2TTY
+
+static char P_tty_text[16];
+
+char * pid2tty(int pid) {
+    int P_tty_num;
+
+    char buf[800]; /* about 40 fields, 64-bit decimal is about 20 chars */
+    int num;
+    int fd;
+    char* tmp;
+    struct stat sb; /* stat() used to get EUID */
+
+    Debug("pid2tty\n");
+    snprintf(buf, 32, "/proc/%d/stat", pid);
+    Debug("trying %s\n", buf);
+    if ( (fd = open(buf, O_RDONLY, 0) ) == -1 ) return 0;
+    num = read(fd, buf, sizeof buf - 1);
+    fstat(fd, &sb);
+    close(fd);
+    if(num<80) {
+	Debug("short read\n");
+	return 0;
+    }
+    Debug("proc stat: %s\n", buf);
+    buf[num] = '\0';
+    tmp = strrchr(buf, ')');
+
+    if (tmp == NULL) return NULL;
+    for (num = 0; num < 5; num++) {
+        tmp = strchr(tmp + 1, ' ');
+	if (tmp == NULL) return NULL;
+    }
+    
+    num = sscanf(tmp + 1, "%d ", &P_tty_num);
+    Debug("pid2tty: pid %d P_tty_num is %d\n", pid, P_tty_num);
+
+    if (P_tty_num != 0) {
+      int tty_maj = (P_tty_num>>8)&0xfff;
+      int tty_min = (P_tty_num&0xff) | ((P_tty_num>>12)&0xfff00);
+      switch (tty_maj) {
+        case 4:
+           snprintf(P_tty_text, sizeof P_tty_text, "tty%d", tty_min);
+	   break;
+        case 136:
+           snprintf(P_tty_text, sizeof P_tty_text, "pts/%d", tty_min);
+	   break;
+	default:
+           snprintf(P_tty_text, sizeof P_tty_text, "%d,%d", tty_maj, tty_min);
+	   break;
+      }
+      Debug("using pid tty %s\n", P_tty_text);
+      return P_tty_text;
+    } else {
+      return NULL;
+    }
+}
+
+#endif
     
 
 /***************************************************************************
@@ -1929,11 +1994,41 @@ Authenticate( struct display *d, char *name, char *passwd, char **msg )
 
     char               *origpw;
 
+    int			status;
+    char		*ttyLine;
+
    /*
     * Nothing to do if no name provided.
     */
     if (!name)
       return(VF_INVALID);
+
+
+#ifdef PAM 
+    ttyLine = NULL;
+    
+    /* as a kludge to disable the various places that want to use gettyLine
+    as the tty for the graphical session, just clear it */
+    d->gettyLine = NULL;
+#ifdef HAVE_PID2TTY
+    if (d->serverPid > 0) {
+        ttyLine = pid2tty(d->serverPid); 
+    }
+#endif
+    status = PamAuthenticate("dtlogin", d->name, passwd, name, ttyLine);
+
+    switch(status) {
+        case PAM_SUCCESS:
+            return(VF_OK);
+
+        case PAM_NEW_AUTHTOK_REQD:
+	    return(VF_PASSWD_AGED);
+
+	default:
+	    return(passwd ? VF_INVALID : VF_CHALLENGE);
+    }
+
+#else
 
    /*
     * Save provided password.
@@ -2022,6 +2117,8 @@ Authenticate( struct display *d, char *name, char *passwd, char **msg )
 
     Audit(p, " Successful login", 0);
     return(VF_OK);
+
+#endif /* !PAM */
 }
 
 
