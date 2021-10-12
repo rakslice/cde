@@ -218,6 +218,9 @@ Widget error_message    = NULL;	/* the error message box		   */
 Widget hostname_message = NULL;	/* the invalid hostname message box	   */
 Widget passwd_message   = NULL;	/* the expired password message box	   */
 
+Widget confirm_os_reboot_message = NULL;
+Widget confirm_os_shutdown_message = NULL;
+
 Widget options_menu = NULL;	/* pop-up menu on options button	   */
 Widget options_item[10];	/* items on options pop_up menu	  	   */
 Widget options_nowindows;	/* nowindows pane on options pop_up menu   */
