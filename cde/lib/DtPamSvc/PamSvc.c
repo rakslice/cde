@@ -94,7 +94,9 @@ static int PamInit(char* prog_name,
     }
 
     if (status == PAM_SUCCESS) {
-        if (line_dev) pam_set_item(pamh, PAM_TTY, line_dev);
+        if (line_dev && strcmp(line_dev, "NULL") != 0 && strcmp(line_dev, "/dev/NULL") != 0) {
+            pam_set_item(pamh, PAM_TTY, line_dev);
+        }
         if (display_name) pam_set_item(pamh, PAM_RHOST, display_name);
     }
 
