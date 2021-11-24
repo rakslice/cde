@@ -712,6 +712,27 @@ ProcessChildDeath( int pid, waitType status )
 		    RestartDisplay (d, FALSE);
 
 		break;
+
+	    case OS_REBOOT_DISPLAY:
+		Debug ("Display exited with OS_REBOOT_DISPLAY\n");
+		if (d->displayType.location == Local) {
+		    StopDisplay(d);
+		    OSReboot();
+		} else {
+		    RestartDisplay (d, FALSE);
+		}
+		break;
+
+	    case OS_SHUTDOWN_DISPLAY:
+		Debug ("Display exited with OS_SHUTDOWN_DISPLAY\n");
+		if (d->displayType.location == Local) {
+		    StopDisplay(d);
+		    OSShutdown();
+		} else {
+		    RestartDisplay (d, FALSE);
+		}
+
+		break;
 	    }
 	}
 	else if ( (d = FindDisplayByServerPid (pid)) != 0 )
@@ -1194,6 +1215,16 @@ TerminateProcess(int pid, int sig )
 #ifdef SIGCONT
     kill (pid, SIGCONT);
 #endif
+}
+
+void
+OSReboot(void) {
+	system("shutdown -r now");
+}
+
+void
+OSShutdown(void) {
+	system("shutdown -P now");
 }
 
 /*
@@ -1789,6 +1820,8 @@ CheckRestartTime( void )
 	
 #ifdef OSFDEBUG
 /* only those other systems are this slow :-) */
+        sleeptime = 6 - (int) (time((time_t *) 0) - statb.st_atime);
+#elif defined(__linux__)
         sleeptime = 6 - (int) (time((time_t *) 0) - statb.st_atime);
 #else
 	sleeptime = 30 - (int) (time((time_t *) 0) - statb.st_atime);

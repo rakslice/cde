@@ -97,6 +97,8 @@
 # define NOTIFY_XDM		10
 # define NOTIFY_BAD_SECLEVEL	11
 # define NOTIFY_LAST_DT		12
+# define NOTIFY_OS_REBOOT       13
+# define NOTIFY_OS_SHUTDOWN     14
 # define NOTIFY_ALT_DTS		20
 
 /***********************************************************************

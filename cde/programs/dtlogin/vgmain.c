@@ -248,6 +248,9 @@ Widget error_message    = NULL;	/* the error message box		   */
 Widget hostname_message = NULL;	/* the invalid hostname message box	   */
 Widget passwd_message   = NULL;	/* the expired password message box	   */
 
+Widget confirm_os_reboot_message = NULL;
+Widget confirm_os_shutdown_message = NULL;
+
 Widget options_menu = NULL;	/* pop-up menu on options button	   */
 Widget options_item[10];	/* items on options pop_up menu	  	   */
 Widget options_nowindows;	/* nowindows pane on options pop_up menu   */
@@ -256,6 +259,8 @@ Widget options_dtlite;		/* dtlite  pane on options pop_up menu	   */
 Widget *alt_dts;		/* alt_dts  widgets on options pop_up menu */
 Widget options_dt;		/* dt regular pane on options pop_up menu */
 Widget options_last_dt;		/* user's last dt 			  */
+Widget options_os_reboot;       /* os reboot pane on options pop_up menu */
+Widget options_os_shutdown;     /* os shutdown pane on options pop_up menu */
 
 Widget lang_menu = NULL;	/* cascading menu on "Language" option	   */
 Widget session_menu = NULL;     /* cascading menu on "Session" option     */
@@ -1191,7 +1196,8 @@ MakeButtons( void )
  *  MakeDialog
  *
  *  Widgets: error_message, help_message, copyright_msg, hostname_message,
- *	     passwd_message
+ *	     passwd_message, os_confirm_reboot_message,
+ *	     os_confirm_shutdown_message
  ***************************************************************************/
 
 void 
@@ -1376,6 +1382,30 @@ MakeDialog( DialogType dtype )
 
 	passwd_message = w;
 	break;
+
+    case confirm_os_reboot:
+
+	xmstr = ReadCatalogXms(MC_HELP_SET, MC_REBOOT_OS_MSG, MC_DEF_REBOOT_OS_MSG);
+	XtSetArg(argt[i], XmNmessageString,		xmstr		); i++;
+
+	w = XmCreateQuestionDialog(tlev, "os_reboot_msg", argt, i);
+
+	XtUnmanageChild(XmMessageBoxGetChild(w,XmDIALOG_HELP_BUTTON));
+
+	confirm_os_reboot_message = w;
+	break;
+
+    case confirm_os_shutdown:
+
+	xmstr = ReadCatalogXms(MC_HELP_SET, MC_SHUTDOWN_OS_MSG, MC_DEF_SHUTDOWN_OS_MSG);
+	XtSetArg(argt[i], XmNmessageString,		xmstr		); i++;
+
+	w = XmCreateQuestionDialog(tlev, "os_shutdown_msg", argt, i);
+
+	XtUnmanageChild(XmMessageBoxGetChild(w,XmDIALOG_HELP_BUTTON));
+
+	confirm_os_shutdown_message = w;
+	break;
     }
 
     /*
@@ -1386,6 +1416,8 @@ MakeDialog( DialogType dtype )
       case error:
       case hostname:
       case expassword:
+      case confirm_os_shutdown:
+      case confirm_os_reboot:
         XtAddCallback(w, XmNokCallback,     RespondDialogCB, NULL);
         XtAddCallback(w, XmNcancelCallback, RespondDialogCB, NULL);
         break;
@@ -1965,6 +1997,42 @@ if ( session_menu != NULL ) {
         XtSetSensitive(options_item[j], False);
     j++;
 
+
+    /*
+     *  [ Reboot OS ] menu pane...
+     */
+    i = k = InitArg(PushBG);
+    xmstr = ReadCatalogXms(MC_LABEL_SET, MC_OS_REBOOT_LABEL, MC_DEF_OS_REBOOT_LABEL);
+    XtSetArg(argt[i], XmNlabelString,                   xmstr           ); i++;
+    options_item[j] = options_os_reboot
+                      = XmCreatePushButtonGadget(options_menu,
+                                                 "options_osReboot",
+                                                 argt, i);
+    XmStringFree(xmstr);
+    XtAddCallback(options_item[j], XmNactivateCallback,
+                  MenuItemCB, (XtPointer) OB_OS_REBOOT);
+
+    if (getenv(LOCATION) == NULL || strcmp(getenv(LOCATION), "local") != 0 )
+        XtSetSensitive(options_item[j], False);
+    j++;
+
+    /*
+     *  [ Shutdown OS ] menu pane...
+     */
+    i = k = InitArg(PushBG);
+    xmstr = ReadCatalogXms(MC_LABEL_SET, MC_OS_SHUTDOWN_LABEL, MC_DEF_OS_SHUTDOWN_LABEL);
+    XtSetArg(argt[i], XmNlabelString,                   xmstr           ); i++;
+    options_item[j] = options_os_shutdown
+                      = XmCreatePushButtonGadget(options_menu,
+                                                 "options_osShutdown",
+                                                 argt, i);
+    XmStringFree(xmstr);
+    XtAddCallback(options_item[j], XmNactivateCallback,
+                  MenuItemCB, (XtPointer) OB_OS_SHUTDOWN);
+
+    if (getenv(LOCATION) == NULL || strcmp(getenv(LOCATION), "local") != 0 )
+        XtSetSensitive(options_item[j], False);
+    j++;
 
     /* 
      *  [ Restart Server ] menu pane...
